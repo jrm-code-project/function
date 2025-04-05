@@ -1,0 +1,66 @@
+;;; -*- Lisp -*-
+
+(in-package "FUNCTION")
+
+(defgeneric binary-compose-left (b f)
+  (:method ((b function) (f function))
+    (lambda (l r)
+      (funcall b (funcall f l) r)))
+  (:method ((b function) (f (eql #'identity)))
+    b)
+  (:method ((b function) (f (eql 'identity)))
+    b))
+
+(defgeneric binary-compose-right (b f)
+  (:method ((b function) (f function))
+    (lambda (l r)
+      (funcall b l (funcall f r))))
+  (:method ((b function) (f (eql #'identity)))
+    b)
+  (:method ((b function) (f (eql 'identity)))
+    b))
+
+(defgeneric compose2 (outer inner)
+  (:method ((outer function) (inner function))
+    (lambda (&rest args)
+      (multiple-value-call outer (apply inner args))))
+  (:method ((outer (eql #'identity)) (inner function))
+    inner)
+  (:method ((outer (eql 'identity)) (inner function))
+    inner)
+  (:method ((outer function) (inner (eql #'identity)))
+    outer)
+  (:method ((outer function) (inner (eql 'identity)))
+    outer))
+
+(defun compose (&rest functions)
+  (fold-left #'compose2 #'identity functions))
+
+(declaim (ftype (function ((function (t t) t)) (function (t) (function (t) t))) curry-left))
+(defun curry-left (binary-function)
+  (lambda (left)
+    (lambda (right)
+      (funcall binary-function left right))))
+
+(declaim (ftype (function ((function (t t) t)) (function (t) (function (t) t))) curry-right))
+(defun curry-right (binary-function)
+  (lambda (right)
+    (lambda (left)
+      (funcall binary-function left right))))
+
+(defgeneric inverse (function))
+
+(declaim (ftype (function ((function (t t) t) t) (function (t) t)) partial-apply-left))
+(defun partial-apply-left (binary-function left)
+  (lambda (right)
+    (funcall binary-function left right)))
+
+(declaim (ftype (function ((function (t t) t) t) (function (t) t)) partial-apply-right))
+(defun partial-apply-right (binary-function right)
+  (lambda (left)
+    (funcall binary-function left right)))
+
+(declaim (ftype (function ((function (t t) t)) (function (t t) t)) swap-arguments))
+(defun swap-arguments (binary-function)
+  (lambda (left right)
+    (funcall binary-function right left)))
