@@ -20,6 +20,26 @@
   (:method ((b function) (f (eql 'identity)))
     b))
 
+(declaim (ftype (FUNCTION ((FUNCTION (T T) T) T) (VALUES FUNCTION &OPTIONAL)) binary->folder))
+(defun binary->folder (binary-function base-case)
+  (lambda (arglist)
+    (fold-left binary-function base-case arglist)))
+
+(declaim (ftype (FUNCTION ((FUNCTION (T T) T)) (VALUES FUNCTION &OPTIONAL)) binary->folder-1))
+(defun binary->folder-1 (binary-function)
+  (lambda (base-case arglist)
+    (fold-left binary-function base-case arglist)))
+
+(declaim (ftype (FUNCTION ((FUNCTION (T T) T) T) (VALUES FUNCTION &OPTIONAL)) binary->n-ary))
+(defun binary->n-ary (binary-function base-case)
+  (lambda (&rest args)
+    (fold-left binary-function base-case args)))
+
+(declaim (ftype (FUNCTION ((FUNCTION (T T) T)) (VALUES FUNCTION &OPTIONAL)) binary->n-ary1))
+(defun binary->n-ary1 (binary-function)
+  (lambda (base-case &rest args)
+    (fold-left binary-function base-case args)))
+
 (defgeneric compose2 (outer inner)
   (:method ((outer function) (inner function))
     (lambda (&rest args)
@@ -48,6 +68,14 @@
     (lambda (left)
       (funcall binary-function left right))))
 
+(defmacro deff (name val &optional (docstring ""))
+  `(eval-when (:load-toplevel :execute)
+     (progn
+       (setf (symbol-function ',name) ,val
+             ,@(when docstring
+                 `((documentation ',name 'cl:function) ,docstring)))
+       ',name)))
+
 (defgeneric inverse (function))
 
 (declaim (ftype (function ((function (t t) t) t) (function (t) t)) partial-apply-left))
@@ -64,3 +92,4 @@
 (defun swap-arguments (binary-function)
   (lambda (left right)
     (funcall binary-function right left)))
+
