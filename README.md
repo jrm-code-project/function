@@ -39,9 +39,9 @@ Combines multiple functions such that the result of each function is passed as t
 
 #### Example:
 ```lisp
-CL-USER> (funcall (compose #'sqrt #'1+ #'1-) 8)
+CL-USER> (funcall (compose #'sqrt #'1+ #'1-) 9)
 3
-;; Explanation: (1- 8) = 7, (1+ 7) = 8, then (sqrt 8) = 3
+;; Explanation: (1- 9) = 8, (1+ 8) = 9, then (sqrt 9) = 3
 ```
 
 ### `curry-left`
