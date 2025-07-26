@@ -4,12 +4,17 @@
 
 (defmacro deff (name val &optional (docstring ""))
   "Define a function NAME with the value VAL. If DOCSTRING is provided, it will be used as the documentation for the function."
-  `(EVAL-WHEN (:LOAD-TOPLEVEL :EXECUTE)
-     (PROGN
-       (SETF (SYMBOL-FUNCTION ',name) ,val
-             ,@(when docstring
-                 `((DOCUMENTATION ',name 'CL:FUNCTION) ,docstring)))
-       ',name)))
+  `(PROGN
+     (EVAL-WHEN (:COMPILE-TOPLEVEL :LOAD-TOPLEVEL :EXECUTE)
+       (DECLAIM (FTYPE FUNCTION ,name)))
+
+     (EVAL-WHEN (:LOAD-TOPLEVEL :EXECUTE)
+       (PROGN
+         (SETF (SYMBOL-FUNCTION ',name) ,val
+               ,@(when (and (stringp docstring)
+                            (not (equal docstring "")))
+                   `((DOCUMENTATION ',name 'CL:FUNCTION) ,docstring)))
+         ',name))))
 
 (defgeneric binary-compose-left (b f)
   (:documentation "Compose a binary function with another function on the left side.")
