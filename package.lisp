@@ -1,10 +1,11 @@
 ;;; -*- Lisp -*-
 
 (defpackage "FUNCTION"
+  (:shadow "COMPOSE")
   (:export "BINARY-COMPOSE-LEFT"
            "BINARY-COMPOSE-RIGHT"
-           "BINARY-FUNCTION->FOLDER"
-           "BINARY-FUNCTION->FOLDER-1"
+           "BINARY->FOLDER"
+           "BINARY->FOLDER-1"
            "BINARY->N-ARY"
            "BINARY->N-ARY1"
            "COMPOSE"
@@ -12,8 +13,12 @@
            "CURRY-LEFT"
            "CURRY-RIGHT"
            "DEFF"
+           "DEFMEMO"
            "INVERSE"
+           "OPPOSITE"
            "PARTIAL-APPLY-LEFT"
            "PARTIAL-APPLY-RIGHT"
+           "PRODUCT-SEQUENCE"
+           "SUM-SEQUENCE"
            "SWAP-ARGUMENTS")
-  (:use "COMMON-LISP" "FOLD"))
+  (:use "ALEXANDRIA" "COMMON-LISP" "FOLD"))

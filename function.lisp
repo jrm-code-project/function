@@ -2,6 +2,29 @@
 
 (in-package "FUNCTION")
 
+(defmacro defmemo (name arguments &body body)
+  (let ((cache-name (intern (format nil "*~A-CACHE*" name) (symbol-package name)))
+        (key-name (intern (format nil "~A-KEY" name) (symbol-package name)))
+        (non-memo-name (intern (format nil "%~A" name) (symbol-package name))))
+    `(progn
+       (defparameter ,cache-name (make-hash-table :test 'equal))
+       (defparameter ,key-name (list ,@(mapcar (lambda (argument) (declare (ignore argument)) nil) arguments)))
+
+       (defun ,non-memo-name ,arguments
+         ,@body)
+
+       (defun ,name ,arguments
+         ,@(map 'list (lambda (argument index)
+                        `(setf (nth ,index ,key-name) ,argument))
+                      arguments
+                      (iota (length arguments)))
+         (or (gethash ,key-name ,cache-name)
+             (let ((key ,key-name))
+               (setq ,key-name (list ,@(mapcar (lambda (argument) (declare (ignore argument)) nil) arguments)))
+               (let ((result (,non-memo-name ,@arguments)))
+                 (setf (gethash key ,cache-name) result)
+                 result)))))))
+
 (defmacro deff (name val &optional (docstring ""))
   "Define a function NAME with the value VAL. If DOCSTRING is provided, it will be used as the documentation for the function."
   `(PROGN
@@ -130,6 +153,12 @@
   (:method ((function (eql 'tanh)))   'atanh)
   )
 
+(declaim (ftype (function ((function (&rest t) t)) (function (&rest t) t)) opposite))
+(defun opposite (predicate)
+  "Given a predicate function, return a new predicate that returns the opposite boolean value."
+  (lambda (&rest objects)
+    (not (apply predicate objects))))
+
 (declaim (ftype (function ((function (t t) t) t) (function (t) t)) partial-apply-left))
 (defun partial-apply-left (binary-function left)
   "Partial-apply a binary function to the left argument, returning a unary function that takes the right argument."
@@ -142,8 +171,23 @@
   (lambda (left)
     (funcall binary-function left right)))
 
+(defun sum-sequence (f sequence)
+  "Fold-left summation over a sequence applying function f to each element.
+
+  (sum-sequence #'f '(a b c)) => (+ (f a) (f b) (f c))
+"
+  (fold-left (binary-compose-right #'+ f) 0 sequence))
+
+(defun product-sequence (f sequence)
+  "Fold-left product over a sequence applying function f to each element.
+
+  (product-sequence #'f '(a b c)) => (* (f a) (f b) (f c))
+"
+  (fold-left (binary-compose-right #'* f) 1 sequence))
+
 (declaim (ftype (function ((function (t t) t)) (function (t t) t)) swap-arguments))
 (defun swap-arguments (binary-function)
   "Swap the arguments of a binary function, returning a new function that takes the arguments in reverse order."
   (lambda (left right)
     (funcall binary-function right left)))
+
