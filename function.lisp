@@ -59,14 +59,14 @@
   (:method ((b function) (f (eql 'identity)))
     b))
 
-(declaim (ftype (FUNCTION ((FUNCTION (T T) T) T) (VALUES FUNCTION &OPTIONAL)) binary->folder))
-(defun binary->folder (binary-function base-case)
+(declaim (ftype (FUNCTION ((FUNCTION (T T) T) T) (VALUES FUNCTION &OPTIONAL)) binary-function->folder))
+(defun binary-function->folder (binary-function base-case)
   "Convert a binary function into a folder function that can be used to reduce a list of arguments."
   (lambda (arglist)
     (fold-left binary-function base-case arglist)))
 
-(declaim (ftype (FUNCTION ((FUNCTION (T T) T)) (VALUES FUNCTION &OPTIONAL)) binary->folder-1))
-(defun binary->folder-1 (binary-function)
+(declaim (ftype (FUNCTION ((FUNCTION (T T) T)) (VALUES FUNCTION &OPTIONAL)) binary-function->folder-1))
+(defun binary-function->folder-1 (binary-function)
   "Convert a binary function into a folder function that can be used to reduce a list of arguments.  The first argument is the base case."
   (lambda (base-case arglist)
     (fold-left binary-function base-case arglist)))

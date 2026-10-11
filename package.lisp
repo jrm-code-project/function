@@ -4,8 +4,8 @@
   (:shadow "COMPOSE")
   (:export "BINARY-COMPOSE-LEFT"
            "BINARY-COMPOSE-RIGHT"
-           "BINARY->FOLDER"
-           "BINARY->FOLDER-1"
+           "binary-function->folder"
+           "binary-function->folder-1"
            "BINARY->N-ARY"
            "BINARY->N-ARY1"
            "COMPOSE"

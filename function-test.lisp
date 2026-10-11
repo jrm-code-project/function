@@ -49,15 +49,15 @@
   (is (eq #'+ (function::binary-compose-right #'+ #'identity)))
   (is (eq #'+ (function::binary-compose-right #'+ 'identity))))
 
-(test binary->folder
-  (is (= 10 (funcall (function::binary->folder #'+ 0) '(1 2 3 4))))
-  (is (= 0 (funcall (function::binary->folder #'+ 0) '())))
-  (is (equal '(3 2 1) (funcall (function::binary->folder (lambda (acc x) (cons x acc)) nil)
+(test binary-function->folder
+  (is (= 10 (funcall (function::binary-function->folder #'+ 0) '(1 2 3 4))))
+  (is (= 0 (funcall (function::binary-function->folder #'+ 0) '())))
+  (is (equal '(3 2 1) (funcall (function::binary-function->folder (lambda (acc x) (cons x acc)) nil)
                                '(1 2 3)))))
 
-(test binary->folder-1
-  (is (= 20 (funcall (function::binary->folder-1 #'+) 10 '(1 2 3 4))))
-  (is (= 10 (funcall (function::binary->folder-1 #'+) 10 '()))))
+(test binary-function->folder-1
+  (is (= 20 (funcall (function::binary-function->folder-1 #'+) 10 '(1 2 3 4))))
+  (is (= 10 (funcall (function::binary-function->folder-1 #'+) 10 '()))))
 
 (test binary->n-ary
   (is (= 10 (funcall (function::binary->n-ary #'+ 0) 1 2 3 4)))
